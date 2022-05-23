@@ -10,7 +10,7 @@ class Vehicle
 
     public string $type = '';
 
-    const CAR = "Car";
+    const CAR = "BridgeCar";
 
     const BUS = "Bus";
 
