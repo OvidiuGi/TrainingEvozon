@@ -1,0 +1,2 @@
+Exemple de Factory Method: Form ce extinde AbstractType
+MailerFactory - pentru diferite tipuri de mailuri
