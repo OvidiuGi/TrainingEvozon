@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66f32c8e-68a3-4196-94b8-824be029e59a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/TrainingEvozon.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TrainingEvozon.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DesignPatterns/Structural/Bridge/BridgeCar.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DesignPatterns/Structural/Bridge/BridgeCarExclusiveImp.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DesignPatterns/Structural/Bridge/BridgeCarImp.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DesignPatterns/Structural/Bridge/BridgeCarMakeModel.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DesignPatterns/Structural/Bridge/BridgeCarSaleImp.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/DesignPatterns/Structural/Bridge/BridgeCarTest.php" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +128,9 @@
       <workItem from="1653039615451" duration="1381000" />
       <workItem from="1653220236575" duration="23008000" />
       <workItem from="1653322724256" duration="599000" />
-      <workItem from="1653385446568" duration="3779000" />
+      <workItem from="1653385446568" duration="8448000" />
+      <workItem from="1653583114890" duration="16432000" />
+      <workItem from="1653729616206" duration="23080000" />
     </task>
     <servers />
   </component>
