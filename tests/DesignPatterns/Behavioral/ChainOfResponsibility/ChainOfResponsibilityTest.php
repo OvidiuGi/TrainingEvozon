@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Tests\DesignPatterns\Behavioral\Chain_Of_Responsibility;
+namespace App\Tests\DesignPatterns\Behavioral\ChainOfResponsibility;
 
-use App\DesignPatterns\Behavioral\Chain_Of_Responsibility\Authenticate;
-use App\DesignPatterns\Behavioral\Chain_Of_Responsibility\CredentialChain;
-use App\DesignPatterns\Behavioral\Chain_Of_Responsibility\RoleChain;
-use App\DesignPatterns\Behavioral\Chain_Of_Responsibility\User;
+use App\DesignPatterns\Behavioral\ChainOfResponsibility\Authenticate;
+use App\DesignPatterns\Behavioral\ChainOfResponsibility\CredentialChain;
+use App\DesignPatterns\Behavioral\ChainOfResponsibility\RoleChain;
+use App\DesignPatterns\Behavioral\ChainOfResponsibility\User;
 use PHPUnit\Framework\TestCase;
 
 class ChainOfResponsibilityTest extends TestCase

@@ -2,7 +2,7 @@
 
 namespace App\DesignPatterns\Creational\FactoryMethod\Example1;
 
-class OpelCarFactoryInterface implements CarFactoryInterface
+class OpelCarFactory implements CarFactoryInterface
 {
     public function createCar(): Car
     {
