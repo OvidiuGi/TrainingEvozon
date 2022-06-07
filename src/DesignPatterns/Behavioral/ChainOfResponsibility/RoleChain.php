@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DesignPatterns\Behavioral\Chain_Of_Responsibility;
+namespace App\DesignPatterns\Behavioral\ChainOfResponsibility;
 
 class RoleChain extends AbstractChain
 {
