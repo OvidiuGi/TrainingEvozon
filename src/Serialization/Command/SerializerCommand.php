@@ -15,16 +15,19 @@ class SerializerCommand extends Command
 {
     use LoggerAwareTrait;
 
+    private StrategySerializer $strategySerializer;
+
     protected static $defaultName = 'app:serialize';
 
     protected static $defaultDescription = 'Serialize a Person';
 
-    protected string $strategyType;
+    private string $strategyType;
 
-    public function __construct(string $strategyType, LoggerInterface $logger)
+    public function __construct(string $strategyType, LoggerInterface $logger, StrategySerializer $strategySerializer)
     {
         $this->logger = $logger;
         $this->strategyType = $strategyType;
+        $this->strategySerializer = $strategySerializer;
         parent::__construct();
     }
 
@@ -33,7 +36,7 @@ class SerializerCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $person = new Person('Marian',15);
 
-        $strategy = StrategySerializer::createStrategy($this->strategyType);
+        $strategy = $this->strategySerializer->createStrategy($this->strategyType);
 
         $serializedData = $strategy->serialize($person, 'xml');
         $deserializedData = $strategy->deserialize($serializedData, 'xml');

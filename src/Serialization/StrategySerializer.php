@@ -4,7 +4,7 @@ namespace App\Serialization;
 
 class StrategySerializer
 {
-    public static function createStrategy(string $strategyType): ?StrategyInterface
+    public function createStrategy(string $strategyType): ?StrategyInterface
     {
         $arr = [
             'php' => new PhpSerializer(),
