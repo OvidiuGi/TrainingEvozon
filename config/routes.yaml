@@ -1,3 +1,6 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+caching:
+  path: /cache
+  controller: App\Cache\CachingController::cache

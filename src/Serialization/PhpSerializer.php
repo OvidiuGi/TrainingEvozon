@@ -2,9 +2,12 @@
 
 namespace App\Serialization;
 
+use App\Cache\PersonMarkerInterface;
+use App\Entity\Person;
+
 class PhpSerializer implements StrategyInterface
 {
-    public function serialize(Person $person, string $format)
+    public function serialize(PersonMarkerInterface $person, string $format)
     {
         if( $format == 'xml') {
             return $person->serialize();
@@ -12,15 +15,17 @@ class PhpSerializer implements StrategyInterface
         return $person->jsonSerialize();
     }
 
-    public function deserialize($data, string $format): Person
+    public function deserialize($data, string $format): PersonMarkerInterface
     {
-        $person = new Person('Unserialized',15);
+        $person = new Person();
         if ($format == 'xml') {
             return $person->unserialize($data);
         }
 
         $deserializedObject = json_decode($data);
+        $person->setName($deserializedObject->name);
+        $person->setAge($deserializedObject->age);
 
-        return new Person($deserializedObject->name,$deserializedObject->age);
+        return $person;
     }
 }

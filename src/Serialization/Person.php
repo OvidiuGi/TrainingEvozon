@@ -2,9 +2,10 @@
 
 namespace App\Serialization;
 
+use App\Cache\PersonMarkerInterface;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
-class Person implements \Serializable,\JsonSerializable
+class Person implements \Serializable,\JsonSerializable,PersonMarkerInterface
 {
     public string $name;
 
