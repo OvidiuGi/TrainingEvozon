@@ -5,7 +5,9 @@ namespace App\Cache;
 use App\Entity\Person;
 use App\Repository\PersonRepository;
 use App\Serialization\StrategySerializer;
+use Predis\Client;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CachingController extends AbstractController
 {
+    public string $redisPassword;
+
     public PersonRepository $personRepository;
 
     public string $strategyType;
@@ -25,26 +29,29 @@ class CachingController extends AbstractController
     public function __construct(
         string $strategyType,
         DoctrineCacheAdapter $adapter,
-        PersonRepository $personRepository
+        PersonRepository $personRepository,
+        string $redisPassword
     )
     {
+        $this->redisPassword = $redisPassword;
         $this->strategyType = $strategyType;
         $this->adapter = $adapter;
         $this->personRepository = $personRepository;
     }
 
     /**
-     * @Route(methods={"GET"})
+     * @Route(path="/{key}", methods={"GET"})
+     * @throws InvalidArgumentException
      */
-    public function cache()
+    public function cache(string $key): Response
     {
         $serializer = new StrategySerializer();
         $strategy = $serializer->createStrategy($this->strategyType);
-        $cacheItem = $this->adapter->getItem('person2');
+        $cacheItem = $this->adapter->getItem($key);
 
         if ($cacheItem->checkExpired())
         {
-            $this->adapter->deleteItem('person2');
+            $this->adapter->deleteItem($key);
 
             return new Response('Expired!',Response::HTTP_GONE);
         }
@@ -61,13 +68,14 @@ class CachingController extends AbstractController
             return new Response('Miss!',Response::HTTP_CREATED);
         }
 
-        return new Response('Hit' . $cacheItem->get(), Response::HTTP_OK);
+        return new Response('Hit' . $cacheItem->get(), Response::HTTP_FOUND);
     }
 
     /**
      * @Route(methods={"POST"})
+     * @throws InvalidArgumentException
      */
-    public function update(Request $request)
+    public function update(Request $request): Response
     {
         $requestData = $request->toArray();
 
@@ -92,4 +100,31 @@ class CachingController extends AbstractController
         return new Response('Updated successfully',Response::HTTP_OK);
     }
 
+    /**
+     * @Route("/redis/{key}", methods={"GET"})
+     */
+    public function redisCache(string $key): Response
+    {
+        $client = new Client();
+        $client->auth($this->redisPassword);
+        $serializer = new StrategySerializer();
+        $strategy = $serializer->createStrategy($this->strategyType);
+        $cacheItem = $client->get($key);
+
+        if($cacheItem == null)
+        {
+          $person = new Person();
+          $person->setName('Mihai');
+          $person->setAge(20);
+          $this->personRepository->add($person, true);
+          $serializedPerson = $strategy->serialize($person, 'json');
+          $client->set($key,$serializedPerson);
+          $client->persist($key);
+          $client->save();
+
+          return new Response('Miss',Response::HTTP_CREATED);
+        }
+
+        return new Response('Hit ' . $cacheItem,Response::HTTP_FOUND);
+    }
 }
