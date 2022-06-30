@@ -36,8 +36,9 @@ class DoctrineCacheAdapter implements CacheItemPoolInterface
         }
 
         $item->setIsHit(true);
+
         $this->entityManager->persist($item);
-        $this->entityManager->flush();
+//        $this->entityManager->flush();
 
         return $item;
     }
@@ -75,7 +76,7 @@ class DoctrineCacheAdapter implements CacheItemPoolInterface
 
     public function save(CacheItemInterface $item)
     {
-        $this->cacheRepository->add($item,true);
+        $this->cacheRepository->add($item);
     }
 
     public function saveDeferred(CacheItemInterface $item)

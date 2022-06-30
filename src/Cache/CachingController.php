@@ -5,6 +5,7 @@ namespace App\Cache;
 use App\Entity\Person;
 use App\Repository\PersonRepository;
 use App\Serialization\StrategySerializer;
+use Doctrine\ORM\EntityManagerInterface;
 use Predis\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
@@ -26,13 +27,16 @@ class CachingController extends AbstractController
 
     private CacheItemPoolInterface $adapter;
 
+    private EntityManagerInterface $entityManager;
+
     public function __construct(
         string $strategyType,
+        EntityManagerInterface $entityManager,
         DoctrineCacheAdapter $adapter,
         PersonRepository $personRepository,
         string $redisPassword
-    )
-    {
+    ) {
+        $this->entityManager = $entityManager;
         $this->redisPassword = $redisPassword;
         $this->strategyType = $strategyType;
         $this->adapter = $adapter;
@@ -49,11 +53,10 @@ class CachingController extends AbstractController
         $strategy = $serializer->createStrategy($this->strategyType);
         $cacheItem = $this->adapter->getItem($key);
 
-        if ($cacheItem->checkExpired())
-        {
+        if ($cacheItem->checkExpired()) {
             $this->adapter->deleteItem($key);
 
-            return new Response('Expired!',Response::HTTP_GONE);
+            return new Response('Expired!', Response::HTTP_GONE);
         }
 
         if (!$cacheItem->isHit()) {
@@ -61,43 +64,35 @@ class CachingController extends AbstractController
             $person->setName('Maria');
             $person->setAge(20);
             $this->personRepository->add($person, true);
-            $serializedPerson = $strategy->serialize($person,'json');
+            $serializedPerson = $strategy->serialize($person, 'json');
             $cacheItem->set($serializedPerson);
             $this->adapter->save($cacheItem);
-
-            return new Response('Miss!',Response::HTTP_CREATED);
+            $this->entityManager->flush();
+            return new Response('Miss!', Response::HTTP_CREATED);
         }
 
         return new Response('Hit' . $cacheItem->get(), Response::HTTP_FOUND);
     }
 
     /**
-     * @Route(methods={"POST"})
+     * @Route(methods={"PUT"})
      * @throws InvalidArgumentException
      */
     public function update(Request $request): Response
     {
         $requestData = $request->toArray();
+        $searchedPerson = $this->personRepository->findOneBy(['id' => $requestData['id']]);
 
-        if (!$this->adapter->hasItem($requestData['key']))
-        {
+        if ($searchedPerson === null) {
             return new Response('Person not found', Response::HTTP_NOT_FOUND);
         }
 
-        $serializer = new StrategySerializer();
-        $strategy = $serializer->createStrategy($this->strategyType);
+        $searchedPerson->setName($requestData['name']);
+        $searchedPerson->setAge($requestData['age']);
 
-        $cacheItem = $this->adapter->getItem($requestData['key']);
-        $deserializedPerson = $strategy->deserialize($cacheItem->get(),'json');
+        $this->personRepository->update($searchedPerson, true);
 
-        $deserializedPerson->setName($requestData['name']);
-        $deserializedPerson->setAge($requestData['age']);
-        $serializedPerson = $strategy->serialize($deserializedPerson,'json');
-
-        $cacheItem->set($serializedPerson);
-        $this->adapter->save($cacheItem);
-
-        return new Response('Updated successfully',Response::HTTP_OK);
+        return new Response('Updated successfully', Response::HTTP_OK);
     }
 
     /**
@@ -110,21 +105,23 @@ class CachingController extends AbstractController
         $serializer = new StrategySerializer();
         $strategy = $serializer->createStrategy($this->strategyType);
         $cacheItem = $client->get($key);
+        $client->expire($key, 1);
+        $client->save();
+        var_dump($cacheItem);
+        if ($cacheItem == null) {
+            $person = new Person();
+            $person->setName('Mihai');
+            $person->setAge(20);
+            $this->personRepository->add($person, true);
+            $serializedPerson = $strategy->serialize($person, 'json');
+            $client->set($key, $serializedPerson);
 
-        if($cacheItem == null)
-        {
-          $person = new Person();
-          $person->setName('Mihai');
-          $person->setAge(20);
-          $this->personRepository->add($person, true);
-          $serializedPerson = $strategy->serialize($person, 'json');
-          $client->set($key,$serializedPerson);
-          $client->persist($key);
-          $client->save();
+            $client->persist($key);
+            $client->save();
 
-          return new Response('Miss',Response::HTTP_CREATED);
+            return new Response('Miss', Response::HTTP_CREATED);
         }
 
-        return new Response('Hit ' . $cacheItem,Response::HTTP_FOUND);
+        return new Response('Hit ' . $cacheItem, Response::HTTP_FOUND);
     }
 }

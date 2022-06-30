@@ -38,4 +38,13 @@ class PersonRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function update(Person $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

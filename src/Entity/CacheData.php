@@ -92,14 +92,6 @@ class CacheData implements CacheItemInterface
 
     public function checkExpired(): bool
     {
-        $date = new \DateTime();
-        if($this->expirationDate <= $date)
-        {
-            $this->expirationDate = null;
-
-            return true;
-        }
-
-        return false;
+        return $this->expirationDate <= new \DateTime();
     }
 }
