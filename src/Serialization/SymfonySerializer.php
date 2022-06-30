@@ -2,6 +2,7 @@
 
 namespace App\Serialization;
 
+use App\Cache\PersonMarkerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -21,13 +22,13 @@ class SymfonySerializer implements StrategyInterface
         $this->serializer = $serializer;
     }
 
-    public function serialize(Person $person, string $format): string
+    public function serialize(PersonMarkerInterface $person, string $format): string
     {
         return $this->serializer->serialize($person, $format);
     }
 
-    public function deserialize($data, string $format): Person
+    public function deserialize($data, string $format): PersonMarkerInterface
     {
-        return $this->serializer->deserialize($data, Person::class, $format);
+        return $this->serializer->deserialize($data, PersonMarkerInterface::class, $format);
     }
 }
